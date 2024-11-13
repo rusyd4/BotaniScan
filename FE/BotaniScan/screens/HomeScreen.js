@@ -12,10 +12,16 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Login'); // Navigate back to the login screen or wherever appropriate
   };
 
+  const handleChooseImage = async () => {
+      // Clear token from AsyncStorage when logging out
+      navigation.navigate('Camera'); // Navigate back to the login screen or wherever appropriate
+   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome to BotaniScan!</Text>
       <Button title="Logout" onPress={handleLogout} />
+      <Button title="Choose Image" onPress={handleChooseImage} />
     </View>
   );
 };

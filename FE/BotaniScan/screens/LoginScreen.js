@@ -16,7 +16,7 @@ const LoginScreen = ({ navigation }) => {
 
     try {
       // Send login request to the backend
-      const response = await axios.post('http://172.16.0.2:5000/login', { email, password });
+      const response = await axios.post('http://192.168.7.7:5001/login', { email, password });
 
       // Check for success
       if (response.data.token) {
