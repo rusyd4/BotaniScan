@@ -1,8 +1,9 @@
 {
-    "0": "Acacia_auriculiformis",
-    "1": "Acacia_mangium",
-    "2": "Barringtonia_asiatica",
-    "3": "Dalbergia_latifolia",
-    "4": "Phyllanthus_emblica",
-    "5": "Neolamarckia_cadamba"    
-}
+    "0": { "name": "Acacia auriculiformis", "rarity": "Least Concerned" },
+    "1": { "name": "Acacia mangium", "rarity": "Least Concerned" },
+    "2": { "name": "Barringtonia asiatica", "rarity": "Least Concerned" },
+    "3": { "name": "Dalbergia latifolia", "rarity": "Least Concerned" },
+    "4": { "name": "Phyllanthus emblica", "rarity": "Least Concerned" },
+    "5": { "name": "Neolamarckia cadamba", "rarity": "Least Concerned" }
+  }
+  

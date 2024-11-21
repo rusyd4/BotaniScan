@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify 
 import torch
 from torchvision import transforms
 from PIL import Image
@@ -38,10 +38,13 @@ def predict():
         
         # Convert output to species name and confidence
         species_id = str(predicted.item())  # Convert to string to match JSON keys
-        species_name = idx_to_class.get(species_id, "Unknown Species")
+        species_info = idx_to_class.get(species_id, {"name": "Unknown Species", "rarity": "Unknown"})
+        species_name = species_info["name"]
+        rarity = species_info["rarity"]
         confidence = torch.softmax(output, dim=1)[0, predicted].item()
-        
-        return jsonify({'species': species_name, 'confidence': confidence})
+
+        # Return species name, rarity, and confidence
+        return jsonify({'species': species_name, 'rarity': rarity, 'confidence': confidence})
 
 if __name__ == '__main__':
     app.run(debug=True)
