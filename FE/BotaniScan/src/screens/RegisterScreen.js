@@ -17,7 +17,7 @@ const RegisterScreen = ({ navigation }) => {
 
     try {
       // Send registration request to backend
-      const response = await axios.post('http://192.168.7.3:5001/register', {
+      const response = await axios.post('http://192.168.7.2:5001/auth/register', {
         username,
         email,
         password,

@@ -82,7 +82,7 @@ const CameraScreen = () => {
       }
   
       const historyResponse = await axios.post(
-        'http://192.168.7.3:5001/history',
+        'http://192.168.7.2:5001/history',
         { species, confidence, rarity },
         {
           headers: {

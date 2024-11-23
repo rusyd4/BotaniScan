@@ -10,7 +10,7 @@ const LeaderboardScreen = () => {
     const fetchLeaderboard = async () => {
       try {
         // Fetch leaderboard data dari backend
-        const response = await axios.get('http://192.168.7.3:5001/leaderboard');
+        const response = await axios.get('http://192.168.7.2:5001/leaderboard');
         setLeaderboard(response.data); // Menyimpan data leaderboard
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
