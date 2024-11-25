@@ -6,9 +6,11 @@ import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen'; // Import the new HomeScreen
 import RegisterScreen from './src/screens/RegisterScreen'; // Import the new RegisterScreen
-import CameraScreen from './src/screens/CameraScreen'; // Import the new RegisterScreen
+import IdentifyScreen from './src/screens/IdentifyScreen'; // Import the new RegisterScreen
 import CollectionScreen from './src/screens/CollectionScreen';
 import LeaderboardScreen from './src/screens/LeaderboardScreen';
+import UserScreen from './src/screens/UserScreen';
+import PasswordScreen from './src/screens/PasswordScreen';
 
 const Stack = createStackNavigator();
 
@@ -32,9 +34,9 @@ const App = () => {
           options={{title: 'Register'}}
         />
         <Stack.Screen
-          name="Camera"
-          component={CameraScreen} // Add HomeScreen here
-          options={{title: 'Camera'}}
+          name="Identify"
+          component={IdentifyScreen} // Add HomeScreen here
+          options={{title: 'Identify'}}
         />
         <Stack.Screen
           name="Collection"
@@ -45,6 +47,16 @@ const App = () => {
           name="Leaderboard"
           component={LeaderboardScreen} // Add HomeScreen here
           options={{title: 'Leaderboard'}}
+        />
+        <Stack.Screen
+          name="User"
+          component={UserScreen} // Add HomeScreen here
+          options={{title: 'User'}}
+        />
+        <Stack.Screen
+          name="Password"
+          component={PasswordScreen} // Add HomeScreen here
+          options={{title: 'Password'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

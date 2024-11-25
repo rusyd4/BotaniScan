@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import NavBar from '../components/NavBar'; // Import the NavBar component
 
 const LeaderboardScreen = () => {
   const [leaderboard, setLeaderboard] = useState([]); // State untuk leaderboard
@@ -44,6 +45,9 @@ const LeaderboardScreen = () => {
       ) : (
         <Text style={styles.noLeaderboardText}>No leaderboard data found.</Text>
       )}
+      
+      {/* Use the NavBar component */}
+      <NavBar />
     </View>
   );
 };
@@ -51,7 +55,6 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
   text: {

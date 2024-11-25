@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import NavBar from '../components/NavBar'; // Import the NavBar component
 
 const CollectionScreen = () => {
   const [collection, setCollection] = useState([]); // State untuk menyimpan koleksi tanaman
@@ -18,7 +19,7 @@ const CollectionScreen = () => {
           return;
         }
 
-        const response = await axios.get('http://192.168.7.2:5001/user/collection', {
+        const response = await axios.get('http://192.168.7.2:5001/collection', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -57,6 +58,9 @@ const CollectionScreen = () => {
       ) : (
         <Text style={styles.noCollectionText}>No collection found.</Text>
       )}
+      
+      {/* Use the NavBar component */}
+      <NavBar />
     </View>
   );
 };
@@ -64,7 +68,6 @@ const CollectionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
   text: {

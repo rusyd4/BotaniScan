@@ -1,96 +1,160 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';  // For storing token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = async () => {
-    // Check if fields are filled
     if (!username || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+      ToastAndroid.show('Please fill in all fields.', ToastAndroid.SHORT);
       return;
     }
 
     try {
-      // Send registration request to backend
       const response = await axios.post('http://192.168.7.2:5001/auth/register', {
         username,
         email,
         password,
       });
 
-      // If registration is successful
       if (response.status === 201) {
-        Alert.alert("Success", "User registered successfully!");
-
-        // Optional: Store token if returned by backend
+        ToastAndroid.show('User registered successfully!', ToastAndroid.SHORT);
         if (response.data.token) {
           await AsyncStorage.setItem('userToken', response.data.token);
         }
-
-        // Navigate to login screen or dashboard
         navigation.navigate('Login');
       } else {
-        Alert.alert("Registration Failed", "Unable to register. Please try again.");
+        ToastAndroid.show(
+          'Registration Failed',
+          ToastAndroid.SHORT
+        );
       }
     } catch (error) {
-      console.error("Registration error:", error);
-      Alert.alert("Registration Error", error.response?.data?.error || "Failed to register user.");
+      console.error('Registration error:', error);
+      ToastAndroid.show(
+        `Registration Error: ${error.response?.data?.error}`,
+        ToastAndroid.SHORT
+      );
     }
   };
 
-
   return (
     <View style={styles.container}>
-      <TextInput
-              style={styles.input}
-              placeholder="Username"
-              value={username}
-              onChangeText={setUsername}
-            />
-            <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <Button title="Register" onPress={handleRegister} />
-      <Text style={styles.text} onPress={() => navigation.goBack()}>
-        Already have an account? Login
-      </Text>
+      <Text style={styles.title}>Sign Up</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email Address"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Text>{showPassword ? ' ' : ' '}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Register</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={styles.footerText}>
+          Already have an account? <Text style={styles.loginText}>Login</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  input: {
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  text: {
-    color: 'blue',
-    marginTop: 10,
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#333333',
     textAlign: 'center',
+    marginBottom: 40,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    color: '#333333',
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  button: {
+    backgroundColor: '#007b6e',
+    borderRadius: 8,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  footerText: {
+    marginTop: 20,
+    textAlign: 'center',
+    color: '#999999',
+  },
+  loginText: {
+    color: '#007b6e',
+    fontWeight: 'bold',
   },
 });
 
 export default RegisterScreen;
+

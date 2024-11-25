@@ -17,6 +17,7 @@ app.use('/auth', require('./routes/auth'));
 app.use('/user', require('./routes/user'));
 app.use('/leaderboard', require('./routes/leaderboard'));
 app.use('/history', require('./routes/history'));
+app.use('/collection', require('./routes/collection'));
 
 // Start server
 app.listen(PORT, () => {
