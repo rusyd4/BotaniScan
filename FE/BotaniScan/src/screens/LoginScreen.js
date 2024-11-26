@@ -22,7 +22,7 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.7.2:5001/auth/login', {
+      const response = await axios.post('http://192.168.1.6:5001/auth/login', {
         email,
         password,
       });

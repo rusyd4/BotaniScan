@@ -19,7 +19,7 @@ const CollectionScreen = () => {
           return;
         }
 
-        const response = await axios.get('http://192.168.7.2:5001/collection', {
+        const response = await axios.get('http://192.168.1.6:5001/collection', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

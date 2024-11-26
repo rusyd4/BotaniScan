@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FontAwesome5 from 'react-native-vector-icons/dist/FontAwesome5';
 import {
   View,
   Text,
@@ -68,7 +69,7 @@ const NavBar = () => {
       <TouchableOpacity
         style={styles.navItem}
         onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.icon}>🏠</Text>
+        <FontAwesome5 name="home" size={24} color="#fff" />
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
 
@@ -82,9 +83,10 @@ const NavBar = () => {
       <TouchableOpacity
         style={styles.navItem}
         onPress={() => setModalVisible(true)}>
-        <Text style={styles.icon}>📷</Text>
+        <FontAwesome5 name="camera" size={24} color="#fff" />
         <Text style={styles.navText}>Scan</Text>
       </TouchableOpacity>
+
 
       <TouchableOpacity
         style={styles.navItem}
