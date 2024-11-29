@@ -10,7 +10,7 @@ const IdentifyScreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
 
   const SERVER_URL = process.env.SERVER_URL || 'http://127.0.0.1:5000';
-  const HISTORY_URL = process.env.HISTORY_URL || 'http://192.168.1.6:5001';
+  const HISTORY_URL = process.env.HISTORY_URL || 'http://192.168.1.29:5001';
 
   useEffect(() => {
     if (imageUri) {

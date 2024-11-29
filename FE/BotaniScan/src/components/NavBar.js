@@ -91,14 +91,14 @@ const NavBar = () => {
       <TouchableOpacity
         style={styles.navItem}
         onPress={() => navigation.navigate('Leaderboard')}>
-        <Text style={styles.icon}>📊</Text>
-        <Text style={styles.navText}>Leaderboard</Text>
+       <FontAwesome5 name="chart-bar" size={24} color="#fff" />
+       <Text style={styles.navText}>Leaderboard</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
         onPress={() => navigation.navigate('User')}>
-        <Text style={styles.icon}>👤</Text>
+        <FontAwesome5 name="user" size={24} color="#fff" />
         <Text style={styles.navText}>User</Text>
       </TouchableOpacity>
 

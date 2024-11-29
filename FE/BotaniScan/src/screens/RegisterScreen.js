@@ -23,7 +23,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.6:5001/auth/register', {
+      const response = await axios.post('http://192.168.1.29:5001/auth/register', {
         username,
         email,
         password,
@@ -85,7 +85,7 @@ const RegisterScreen = ({ navigation }) => {
           style={styles.eyeIcon}
           onPress={() => setShowPassword(!showPassword)}
         >
-          <Text>{showPassword ? ' ' : ' '}</Text>
+          <Text>{showPassword ? '🙈' : '👁️'}</Text>
         </TouchableOpacity>
       </View>
 

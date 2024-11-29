@@ -18,7 +18,7 @@ const UserScreen = ({ navigation }) => {
           console.log('User not logged in');
           return;
         }
-        const response = await axios.get('http://192.168.1.6:5001/user/me', {
+        const response = await axios.get('http://192.168.1.29:5001/user/me', {
             headers: {
               Authorization: `Bearer ${token}`,
             },

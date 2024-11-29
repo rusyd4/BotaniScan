@@ -6,50 +6,60 @@ import {
   Text,
   StyleSheet,
   ToastAndroid,
+  Image,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [emailOrUsername, setEmailOrUsername] = useState('');
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      ToastAndroid.show('Email and password are required', ToastAndroid.SHORT);
+    if (!emailOrUsername || !password) {
+      ToastAndroid.show('Email/Username and password are required', ToastAndroid.SHORT);
       return;
     }
 
     try {
-      const response = await axios.post('http://192.168.1.6:5001/auth/login', {
-        email,
+      const response = await axios.post('http://192.168.1.29:5001/auth/login', {
+        emailOrUsername,
         password,
       });
 
       if (response.data.token) {
         await AsyncStorage.setItem('authToken', response.data.token);
-        navigation.navigate('Home'); // Replace 'Home' with the correct route
+        navigation.navigate('Home');
       } else {
-        ToastAndroid.show('Login failed, invalid credentials', ToastAndroid.SHORT);
+        ToastAndroid.show('Login failed', ToastAndroid.SHORT);
       }
     } catch (error) {
-      console.error('Login error:', error.payload);
-      ToastAndroid.show('Login failed, an error occurred', ToastAndroid.SHORT);
+      if (error.response) {
+        ToastAndroid.show(error.response.data.error, ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show('Login failed, an error occurred', ToastAndroid.SHORT);
+      }
     }
   };
 
   return (
     <View style={styles.container}>
+      {/* Logo Section */}
+      <Image
+        source={{ uri: 'https://i.imgur.com/bZU6EFU.png' }} // Ganti URL dengan logo Anda
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
       <Text style={styles.title}>Sign In</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Email Address"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
+          placeholder="Email or Username"
+          value={emailOrUsername}
+          onChangeText={setEmailOrUsername}
         />
       </View>
 
@@ -65,7 +75,7 @@ const LoginScreen = ({ navigation }) => {
           style={styles.eyeIcon}
           onPress={() => setShowPassword(!showPassword)}
         >
-          <Text>{showPassword ? ' ' : ' '}</Text>
+          <Text>{showPassword ? '🙈' : '👁️'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -89,28 +99,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
+  logo: {
+    width: 250,
+    height: 250,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#333333',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#cccccc',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 50,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
   input: {
     flex: 1,
-    height: 50,
     fontSize: 16,
     color: '#333333',
   },
   eyeIcon: {
-    padding: 10,
+    padding: 5,
   },
   button: {
     backgroundColor: '#007b6e',
@@ -119,6 +141,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
+    shadowColor: '#007b6e',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 4,
   },
   buttonText: {
     color: '#ffffff',
@@ -137,4 +164,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-
