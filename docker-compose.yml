@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./BE  # Mengarah ke folder BE tempat Dockerfile backend berada
+    ports:
+      - "5001:5001"  # Mengarah ke port backend
+    env_file:
+      - .env  # Memuat variabel dari file .env
+    volumes:
+      - ./BE:/app  # Volume untuk menghubungkan folder BE ke dalam container
+    networks:
+      - botaniscan_network
+
+  frontend:
+    build:
+      context: ./FE  # Mengarah ke folder FE tempat Dockerfile frontend berada
+    ports:
+      - "8081:8081"  # Mengarah ke port frontend (sesuaikan dengan port yang digunakan React Native)
+    environment:
+      - REACT_APP_API_URL=http://backend:5001  # Menghubungkan frontend dengan backend
+    volumes:
+      - ./FE:/app  # Volume untuk menghubungkan folder FE ke dalam container
+    depends_on:
+      - backend  # Pastikan backend dijalankan terlebih dahulu
+    networks:
+      - botaniscan_network
+
+  model:
+    build:
+      context: ./Model  # Mengarah ke folder Model tempat Dockerfile model berada
+    ports:
+      - "5002:5001"  # Jika model juga menggunakan port 5001 (sesuaikan dengan kebutuhan Anda)
+    environment:
+      - MODEL_PATH=${MODEL_PATH}  # Sesuaikan dengan variabel yang diperlukan
+    volumes:
+      - ./Model:/app  # Volume untuk menghubungkan folder Model ke dalam container
+    networks:
+      - botaniscan_network
+
+networks:
+  botaniscan_network:
+    driver: bridge
