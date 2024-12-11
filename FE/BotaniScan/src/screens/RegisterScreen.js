@@ -23,7 +23,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.29:5001/auth/register', {
+      const response = await axios.post('http://10.10.59.110:5001/auth/register', {
         username,
         email,
         password,
@@ -157,4 +157,3 @@ const styles = StyleSheet.create({
 });
 
 export default RegisterScreen;
-

@@ -25,7 +25,7 @@ const PasswordScreen = ({ navigation }) => {
       }
 
       await axios.post(
-        'http://192.168.1.29:5001/user/change-password',
+        'http://10.10.59.110:5001/user/change-password',
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -125,4 +125,3 @@ const styles = StyleSheet.create({
 });
 
 export default PasswordScreen;
-

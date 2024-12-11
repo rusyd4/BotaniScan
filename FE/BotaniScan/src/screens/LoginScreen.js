@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../configs/config';
+
 
 const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.29:5001/auth/login', {
+      const response = await axios.post(`${config.API_BASE_URL}/auth/login`, {
         emailOrUsername,
         password,
       });

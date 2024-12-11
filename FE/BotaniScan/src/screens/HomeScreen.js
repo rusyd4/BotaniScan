@@ -27,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.1.29:5001/history', {
+      const response = await axios.get('http://10.10.59.110:5001/history', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

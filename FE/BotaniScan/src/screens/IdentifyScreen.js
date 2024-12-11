@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, Text, ActivityIndicator, ToastAndroid } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  ToastAndroid,
+} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/NavBar'; // Import the NavBar component
+import config from '../configs/config';
 
-const IdentifyScreen = ({ route }) => {
+const IdentifyScreen = ({route}) => {
   const [imageUri, setImageUri] = useState(route.params?.imageUri || null);
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const SERVER_URL = process.env.SERVER_URL || 'http://127.0.0.1:5000';
-  const HISTORY_URL = process.env.HISTORY_URL || 'http://192.168.1.29:5001';
+  const HISTORY_URL = process.env.HISTORY_URL || 'http://localhost:5001';
 
   useEffect(() => {
     if (imageUri) {
@@ -23,96 +31,69 @@ const IdentifyScreen = ({ route }) => {
       ToastAndroid.show('No image selected.', ToastAndroid.SHORT);
       return;
     }
-  
+
     setLoading(true); // Start loading
     const formData = new FormData();
-    formData.append('file', {
+    formData.append('images', {
       uri: imageUri,
       name: 'photo.jpg',
       type: 'image/jpeg',
     });
-  
+
     try {
-      const response = await axios.post(`${SERVER_URL}/predict`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
-      const { species, confidence, rarity } = response.data;
-      setPrediction(response.data);
-  
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) {
-        ToastAndroid.show('Please log in to save predictions.', ToastAndroid.SHORT);
-        return;
-      }
-  
-      // Add species to history (always save history)
-      await axios.post(
-        `${HISTORY_URL}/history`,
-        { species, confidence, rarity },
+      const response = await axios.post(
+        'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10P1iYknQtt6YMuwMAqGfjku',
+        formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
           },
-        }
-      );
-      ToastAndroid.show('Prediction saved to history.', ToastAndroid.SHORT);
-  
-      // Check if species already exists in the collection
-      const collectionResponse = await axios.get(`${HISTORY_URL}/collection`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
         },
-      });
-  
-      const isSpeciesExists = collectionResponse.data.some(
-        plant => plant.species === species
       );
-  
-      if (!isSpeciesExists) {
-        // Add species to collection
-        await axios.post(
-          `${HISTORY_URL}/collection`,
-          { species, confidence, rarity },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        ToastAndroid.show('Species added to collection.', ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show('Species already exists in your collection.', ToastAndroid.SHORT);
-      }
+
+      const apiData = response.data;
+
+      // Mapping output to the desired format
+      const bestMatch = apiData.bestMatch;
+      const results = apiData.results.map(item => ({
+        score: item.score,
+        species: item.species.scientificName,
+        commonNames: item.species.commonNames,
+      }));
+
+      // Set prediction
+      setPrediction({bestMatch, results});
+
+      ToastAndroid.show('Image processed successfully.', ToastAndroid.SHORT);
     } catch (error) {
-      ToastAndroid.show('Failed to process the image or save data.', ToastAndroid.SHORT);
+      ToastAndroid.show('Failed to process the image.', ToastAndroid.SHORT);
       console.error('Prediction or data error: ', error);
     } finally {
       setLoading(false); // Stop loading
     }
   };
-  
-  
 
   return (
     <View style={styles.container}>
-      {imageUri && (
-        <Image source={{ uri: imageUri }} style={styles.image} />
-      )}
+      {imageUri && <Image source={{uri: imageUri}} style={styles.image} />}
 
       {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
       {prediction && (
         <View style={styles.resultContainer}>
-          <Text>Species: {prediction.species}</Text>
-          <Text>Confidence: {prediction.confidence}</Text>
-          <Text>Rarity: {prediction.rarity}</Text>
+          <Text>Best Match: {prediction.bestMatch}</Text>
+          <Text>Top Results:</Text>
+          {prediction.results.map((result, index) => (
+            <View key={index} style={styles.resultItem}>
+              <Text>Species: {result.species}</Text>
+              <Text>Common Names: {result.commonNames.join(', ')}</Text>
+              <Text>Score: {result.score.toFixed(4)}</Text>
+            </View>
+          ))}
         </View>
       )}
-      
+
       {/* Use the NavBar component */}
       <NavBar />
     </View>
@@ -139,11 +120,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 4,
+  },
+  resultItem: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
 });
 
 export default IdentifyScreen;
-
