@@ -9,6 +9,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { Image } from 'react-native';
+
+
 
 const NavBar = () => {
   const navigation = useNavigation();
@@ -67,37 +70,37 @@ const NavBar = () => {
     <View style={styles.navbar}>
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.icon}>🏠</Text>
-        <Text style={styles.navText}>Home</Text>
+              onPress={() => navigation.navigate('Home')}>
+              <Image source={require('../assets/Icons/home.png')} style={styles.iconImage} />
+              <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate('Collection')}>
-        <Text style={styles.icon}>📁</Text>
-        <Text style={styles.navText}>Collection</Text>
+                onPress={() => navigation.navigate('History')}>
+                <Image source={require('../assets/Icons/ClockClockwise.png')} style={styles.iconImage} />
+                <Text style={styles.navText}>History</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => setModalVisible(true)}>
-        <Text style={styles.icon}>📷</Text>
-        <Text style={styles.navText}>Scan</Text>
+                onPress={() => setModalVisible(true)}>
+                <Image source={require('../assets/Icons/Vector.png')} style={styles.iconImage} />
+                <Text style={styles.navText}>Scan</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate('Leaderboard')}>
-        <Text style={styles.icon}>📊</Text>
-        <Text style={styles.navText}>Leaderboard</Text>
+                onPress={() => navigation.navigate('Leaderboard')}>
+                <Image source={require('../assets/Icons/ChartBar.png')} style={styles.iconImage} />
+                <Text style={styles.navText}>Leaderboard</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate('User')}>
-        <Text style={styles.icon}>👤</Text>
-        <Text style={styles.navText}>User</Text>
+                onPress={() => navigation.navigate('User')}>
+                <Image source={require('../assets/Icons/user.png')} style={styles.iconImage} />
+                <Text style={styles.navText}>User</Text>
       </TouchableOpacity>
 
       {/* Modal */}
@@ -149,9 +152,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  icon: {
-    fontSize: 24,
-    color: '#fff',
+  iconImage: {
+      width: 24,
+      height: 24,
+      resizeMode: 'contain',
   },
   navText: {
     color: '#fff',

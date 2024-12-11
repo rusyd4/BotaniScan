@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import config from '../configs/config';
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -23,7 +23,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.7.2:5001/auth/register', {
+      const response = await axios.post(`${config.API_BASE_URL}/auth/register`, {
         username,
         email,
         password,

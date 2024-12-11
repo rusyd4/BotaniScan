@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator,
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../configs/config';
 
 const PasswordScreen = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -25,7 +26,7 @@ const PasswordScreen = ({ navigation }) => {
       }
 
       await axios.post(
-        'http://192.168.7.2:5001/user/change-password',
+        `${config.API_BASE_URL}/user/change-password`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -35,21 +36,17 @@ const PasswordScreen = ({ navigation }) => {
       navigation.goBack();
     } catch (error) {
       setLoading(false);
-      console.error('Change password error:', error);
+      console.error('Change password error:', error.response?.data?.error);
       ToastAndroid.show('Failed to change password. Please try again.', ToastAndroid.SHORT);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back" size={24} color="#000" />
-      </TouchableOpacity>
 
       <Text style={styles.title}>Change Password</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-closed-outline" size={20} color="#000" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
           placeholder="Current Password"
@@ -60,7 +57,6 @@ const PasswordScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock-closed-outline" size={20} color="#000" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
           placeholder="New Password"

@@ -27,28 +27,33 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+    if (!emailOrUsername || !password) {
+      return res.status(400).json({ error: 'Email/Username and password are required' });
     }
 
-    const user = await User.findOne({ email });
+    // Cari pengguna berdasarkan email atau username
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }]
+    });
+
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Invalid email/username or password' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Invalid email/username or password' });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ message: 'Login successful', token });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(400).json({ error: 'Login failed' });
+    res.status(500).json({ error: 'An error occurred while processing your request' });
   }
 });
+
 
 module.exports = router;

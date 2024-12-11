@@ -7,7 +7,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen'; // Import the new HomeScreen
 import RegisterScreen from './src/screens/RegisterScreen'; // Import the new RegisterScreen
 import IdentifyScreen from './src/screens/IdentifyScreen'; // Import the new RegisterScreen
-import CollectionScreen from './src/screens/CollectionScreen';
+import HistoryScreen from './src/screens/HistoryScreen';
 import LeaderboardScreen from './src/screens/LeaderboardScreen';
 import UserScreen from './src/screens/UserScreen';
 import PasswordScreen from './src/screens/PasswordScreen';
@@ -26,7 +26,7 @@ const App = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen} // Add HomeScreen here
-          options={{title: 'Home'}}
+          options={{title: 'Home', headerShown: false}}
         />
         <Stack.Screen
           name="Register"
@@ -39,19 +39,19 @@ const App = () => {
           options={{title: 'Identify'}}
         />
         <Stack.Screen
-          name="Collection"
-          component={CollectionScreen} // Add HomeScreen here
-          options={{title: 'Collection'}}
+          name="History"
+          component={HistoryScreen} // Add HomeScreen here
+          options={{title: 'History', headerShown: false}}
         />
         <Stack.Screen
           name="Leaderboard"
           component={LeaderboardScreen} // Add HomeScreen here
-          options={{title: 'Leaderboard'}}
+          options={{title: 'Leaderboard', headerShown: false}}
         />
         <Stack.Screen
           name="User"
           component={UserScreen} // Add HomeScreen here
-          options={{title: 'User'}}
+          options={{title: 'User', headerShown: false}}
         />
         <Stack.Screen
           name="Password"

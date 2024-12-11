@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ActivityInd
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NavBar from '../components/NavBar'; // Import the NavBar component
+import config from '../configs/config';
 
 const UserScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null); // State untuk menyimpan data user
@@ -18,7 +20,7 @@ const UserScreen = ({ navigation }) => {
           console.log('User not logged in');
           return;
         }
-        const response = await axios.get('http://192.168.7.2:5001/user/me', {
+        const response = await axios.get(`${config.API_BASE_URL}/user/me`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -53,17 +55,8 @@ const UserScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <TouchableOpacity style={styles.backButton}>
-        <Icon name="arrow-back" size={24} color="#000" />
-      </TouchableOpacity>
-
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/100' }} // Ganti dengan URI gambar profil jika ada
-          style={styles.profileImage}
-        />
         <Text style={styles.profileName}>{userData.username}</Text>
       </View>
 
@@ -71,22 +64,12 @@ const UserScreen = ({ navigation }) => {
       <View style={styles.infoSection}>
         {/* Full Name */}
         <View style={styles.infoRow}>
-          <Icon name="person-outline" size={20} color="#000" style={styles.infoIcon} />
-          <TextInput
-            style={styles.infoText}
-            value={userData.username}
-            editable={false} // Non-editable
-          />
+          <Text style={styles.infoText}>Username: {userData.username}</Text>
         </View>
 
         {/* Email Address */}
         <View style={styles.infoRow}>
-          <Icon name="mail-outline" size={20} color="#000" style={styles.infoIcon} />
-          <TextInput
-            style={styles.infoText}
-            value={userData.email}
-            editable={false} // Non-editable
-          />
+          <Text style={styles.infoText}>Email: {userData.email}</Text>
         </View>
       </View>
 
@@ -96,9 +79,10 @@ const UserScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Password')}
       >
         <Text style={styles.changePasswordText}>Change Password</Text>
-        <Icon name="chevron-forward" size={20} color="#000" />
       </TouchableOpacity>
 
+      {/* Use the NavBar component */}
+      <NavBar />
     </View>
   );
 };
@@ -107,7 +91,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
     paddingTop: 24,
   },
   backButton: {
