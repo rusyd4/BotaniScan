@@ -21,7 +21,7 @@ const App = () => {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{title: 'Login'}}
+          options={{title: 'Login', headerShown: false}}
         />
         <Stack.Screen
           name="Home"
@@ -31,7 +31,7 @@ const App = () => {
         <Stack.Screen
           name="Register"
           component={RegisterScreen} // Add HomeScreen here
-          options={{title: 'Register'}}
+          options={{title: 'Register', headerShown: false}}
         />
         <Stack.Screen
           name="Identify"

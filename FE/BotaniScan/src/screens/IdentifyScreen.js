@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
+import config from '../configs/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -19,6 +21,53 @@ const IdentifyScreen = ({ route }) => {
   const [imageUri, setImageUri] = useState(route.params?.imageUri || null);
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const addPlantToHistory = async (species, score, image) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      const normalizedScore = score / 100; // Konversi skor ke 0-1
+  
+      const payload = {
+        species,
+        score: normalizedScore,
+        image,
+      };
+  
+      console.log('Payload:', payload); // Debug payload yang telah diperbaiki
+  
+      // Tambahkan ke riwayat
+      const historyResponse = await axios.post(
+        `${config.API_BASE_URL}/history`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log('Response History:', historyResponse.data);
+  
+      // Tambahkan ke koleksi
+      const collectionResponse = await axios.post(
+        `${config.API_BASE_URL}/collection`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log('Response Collection:', collectionResponse.data);
+      ToastAndroid.show('Plant added to history and collection.', ToastAndroid.SHORT);
+    } catch (error) {
+      console.error('Error adding plant to history/collection:', error);
+      ToastAndroid.show('Failed to add plant to history/collection.', ToastAndroid.SHORT);
+    }
+  };
+  
+  
 
   const processImage = async () => {
     if (!imageUri) {
@@ -51,10 +100,16 @@ const IdentifyScreen = ({ route }) => {
       const results = apiData.results.map(item => ({
         score: item.score,
         species: item.species.scientificName,
-        commonNames: item.species.commonNames,
       }));
 
       setPrediction({ bestMatch, results });
+
+      // Tambahkan tanaman ke riwayat
+      if (bestMatch) {
+        const bestResult = results[0]; // Ambil hasil terbaik
+        addPlantToHistory(bestResult.species, bestResult.score * 100, imageUri);
+      }
+
       ToastAndroid.show('Gambar berhasil diproses.', ToastAndroid.SHORT);
     } catch (error) {
       ToastAndroid.show('Gagal memproses gambar.', ToastAndroid.SHORT);
@@ -72,16 +127,16 @@ const IdentifyScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
         {imageUri && (
           <View style={styles.imageContainer}>
-            <Image 
-              source={{uri: imageUri}} 
-              style={styles.image} 
+            <Image
+              source={{ uri: imageUri }}
+              style={styles.image}
               blurRadius={loading ? 5 : 0}
             />
             {loading && (
@@ -109,9 +164,6 @@ const IdentifyScreen = ({ route }) => {
                   <Text style={styles.flaskEmoji}>🧪</Text>
                   <Text style={styles.resultSpecies}>{result.species}</Text>
                 </View>
-                <Text style={styles.resultCommonNames}>
-                  Nama Umum: {result.commonNames.join(', ')}
-                </Text>
                 <Text style={styles.resultScore}>
                   Akurasi: {(result.score * 100).toFixed(2)}%
                 </Text>
@@ -125,6 +177,7 @@ const IdentifyScreen = ({ route }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

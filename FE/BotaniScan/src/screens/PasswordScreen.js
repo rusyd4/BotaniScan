@@ -52,6 +52,7 @@ const PasswordScreen = ({ navigation }) => {
           placeholder="Current Password"
           secureTextEntry
           value={currentPassword}
+          placeholderTextColor='gray'
           onChangeText={setCurrentPassword}
         />
       </View>
@@ -63,6 +64,7 @@ const PasswordScreen = ({ navigation }) => {
           secureTextEntry
           value={newPassword}
           onChangeText={setNewPassword}
+          placeholderTextColor='gray'
         />
       </View>
 

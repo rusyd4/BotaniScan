@@ -43,19 +43,19 @@ const HistoryScreen = () => {
   const renderHistoryItem = ({ item }) => (
     <View style={styles.historyItem}>
       <Image
-        source={plantImages[item.species]}
+        source={{ uri: item.image || 'default-placeholder-url' }} // Placeholder jika image kosong
         style={styles.historyImage}
       />
       <View style={styles.historyTextContainer}>
         <Text style={styles.historyText}>Species: {item.species}</Text>
-        <Text style={styles.historyText}>Rarity: {item.rarity}</Text>
-        <Text style={styles.historyText}>Confidence: {item.confidence.toFixed(2)}</Text>
+        <Text style={styles.historyText}>Score: {(item.score * 100).toFixed(2)}%</Text>
         <Text style={styles.historyTimestamp}>
           Predicted on: {new Date(item.timestamp).toLocaleString()}
         </Text>
       </View>
     </View>
   );
+  
 
   return (
     <View style={styles.container}>

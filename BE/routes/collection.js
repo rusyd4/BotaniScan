@@ -6,10 +6,10 @@ const router = express.Router();
 
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { species, confidence, rarity } = req.body;
+    const { species, score, image } = req.body;
 
-    if (!species || !confidence || !rarity) {
-      return res.status(400).json({ error: 'Species, confidence, and rarity are required.' });
+    if (!species || !score || !image) {
+      return res.status(400).json({ error: 'Species, score, and image are required.' });
     }
 
     const user = await User.findById(req.userId).populate('collection');
@@ -23,7 +23,7 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(200).json({ message: 'Species already exists in collection.' });
     }
 
-    const newPlant = new Plant({ species, confidence, rarity });
+    const newPlant = new Plant({ species, score, image });
     await newPlant.save();
 
     user.collection.push(newPlant._id);
@@ -35,6 +35,7 @@ router.post('/', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Failed to add plant to collection.' });
   }
 });
+
 
 
 router.get('/', authenticate, async (req, res) => {

@@ -1,46 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import NavBar from '../components/NavBar'; // Import NavBar
-import plantImages from '../assets/plants/plantImages'; // Import plant images
 import config from '../configs/config';
 
 const HomeScreen = () => {
   const [collection, setCollection] = useState([]); // State untuk menyimpan koleksi tanaman
   const [loading, setLoading] = useState(true); // State untuk loading
 
-  useEffect(() => {
-    const fetchCollection = async () => {
-      try {
-        const token = await AsyncStorage.getItem('authToken');
-        if (!token) {
-          console.log('User not logged in');
-          return;
-        }
-
-        const response = await axios.get(`${config.API_BASE_URL}/collection`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setCollection(response.data); // Menyimpan data koleksi spesies unik
-      } catch (error) {
-        console.error('Error fetching collection:', error);
-      } finally {
-        setLoading(false);
+  // Fetch collection dari API
+  const fetchCollection = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        console.log('User not logged in');
+        return;
       }
-    };
 
-    fetchCollection();
-  }, []);
+      const response = await axios.get(`${config.API_BASE_URL}/collection`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCollection(response.data); // Menyimpan data koleksi spesies unik
+    } catch (error) {
+      console.error('Error fetching collection:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Gunakan useFocusEffect untuk memanggil fetchCollection setiap kali HomeScreen mendapat fokus
+  useFocusEffect(
+    useCallback(() => {
+      fetchCollection(); // Memanggil fetchCollection setiap kali layar HomeScreen mendapat fokus
+    }, [])
+  );
 
   const renderCollectionItem = ({ item }) => (
     <TouchableOpacity style={styles.collectionCard}>
-      {/* Display plant image */}
       <Image
-        source={plantImages[item.species]} // Assuming the species name matches the image name
+        source={{ uri: item.image }} // URL gambar dari backend
         style={styles.plantImage}
         resizeMode="cover"
       />

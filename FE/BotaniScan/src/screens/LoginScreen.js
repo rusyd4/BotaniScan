@@ -49,7 +49,7 @@ const LoginScreen = ({ navigation }) => {
     <View style={styles.container}>
       {/* Logo Section */}
       <Image
-        source={{ uri: 'https://i.imgur.com/bZU6EFU.png' }} // Ganti URL dengan logo Anda
+        source={require('../assets/Icons/botaniscan.png')}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -60,6 +60,7 @@ const LoginScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Email or Username"
+          placeholderTextColor='gray'
           value={emailOrUsername}
           onChangeText={setEmailOrUsername}
         />
@@ -72,6 +73,7 @@ const LoginScreen = ({ navigation }) => {
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
+          placeholderTextColor='gray'
         />
         <TouchableOpacity
           style={styles.eyeIcon}
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333333',
+    color: 'black',
   },
   eyeIcon: {
     padding: 5,

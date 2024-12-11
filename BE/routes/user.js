@@ -54,7 +54,35 @@ router.post('/change-password', authenticate, async (req, res) => {
       }
     });
     
-    module.exports = router;
+// Endpoint untuk mengganti foto profil
+router.put('/update-profile-picture', authenticate, async (req, res) => {
+  try {
+    const { profilePicture } = req.body;
+
+    // Validasi input
+    if (!profilePicture) {
+      return res.status(400).json({ error: 'Profile picture URL is required.' });
+    }
+
+    // Cari user berdasarkan ID dari token
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // Perbarui foto profil pengguna
+    user.profilePicture = profilePicture;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile picture updated successfully.',
+      profilePicture: user.profilePicture,
+    });
+  } catch (error) {
+    console.error('Error updating profile picture:', error);
+    res.status(500).json({ error: 'Failed to update profile picture. Please try again later.' });
+  }
+});
     
 
 module.exports = router;

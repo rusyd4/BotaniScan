@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -7,7 +6,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
   collection: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Plant' }],
+  profilePicture: {
+    type: String, // URL untuk gambar profil
+    default: 'https://example.com/default-profile-picture.png', // Gambar profil default
+  },
 });
 
 module.exports = mongoose.model('User', userSchema);
-
