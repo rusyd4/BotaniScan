@@ -124,11 +124,11 @@ const styles = StyleSheet.create({
   },
   secondPlace: {
     backgroundColor: '#C0C0C0',
-    height: 120,
+    height: 130,
   },
   thirdPlace: {
     backgroundColor: '#CD7F32',
-    height: 105,
+    height: 115,
   },
   podiumRank: {
     fontSize: 18,

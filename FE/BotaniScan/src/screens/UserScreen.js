@@ -12,6 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
+import config from '../configs/config';
 
 const UserScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null); // State untuk menyimpan data user
@@ -27,7 +28,7 @@ const UserScreen = ({ navigation }) => {
           console.log('User not logged in');
           return;
         }
-        const response = await axios.get('http://192.168.1.103:5001/user/me', {
+        const response = await axios.get(`${config.API_BASE_URL}/user/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -138,17 +139,26 @@ const UserScreen = ({ navigation }) => {
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Are you sure?</Text>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={handleLogout}>
-                <Text style={styles.modalButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalButtonText}>No</Text>
-              </TouchableOpacity>
+              <Image 
+                source={require('../assets/Icons/Circle_Warning.png')} 
+                style={styles.modalIcon} 
+              />
+              <Text style={styles.modalTitle}>Logout Confirmation</Text>
+              <Text style={styles.modalDescription}>
+                Are you sure you want to log out of your account?
+              </Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonCancel]}
+                  onPress={() => setModalVisible(false)}>
+                  <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonConfirm]}
+                  onPress={handleLogout}>
+                  <Text style={styles.modalButtonTextConfirm}>Logout</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -225,28 +235,66 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContainer: {
-    width: 300,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 20,
+    width: 320,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalIcon: {
+    width: 80,
+    height: 80,
+    marginBottom: 16,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 12,
+    color: '#333',
+  },
+  modalDescription: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   modalButton: {
-    width: '100%',
+    flex: 1,
     padding: 12,
-    borderRadius: 4,
-    backgroundColor: '#00c853',
+    borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 10,
+    marginHorizontal: 8,
   },
-  modalButtonText: {
-    color: '#fff',
+  modalButtonCancel: {
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  modalButtonConfirm: {
+    backgroundColor: '#00c853',
+  },
+  modalButtonTextCancel: {
+    color: '#333',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  modalButtonTextConfirm: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
 

@@ -1,15 +1,22 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Image, 
+  StyleSheet, 
+  TouchableOpacity 
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useFocusEffect } from '@react-navigation/native';
-import plantImages from '../assets/plants/plantImages';
-import NavBar from '../components/NavBar'; // Import the NavBar component
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import config from '../configs/config';
 
 const HistoryScreen = () => {
-  const [history, setHistory] = useState([]); // State untuk menyimpan riwayat
-  const [loading, setLoading] = useState(true); // State untuk loading
+  const navigation = useNavigation();
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchHistory = async () => {
     try {
@@ -26,7 +33,7 @@ const HistoryScreen = () => {
         },
       });
 
-      setHistory(response.data); // Menyimpan data riwayat
+      setHistory(response.data);
     } catch (error) {
       console.error('Error fetching history:', error);
     } finally {
@@ -40,40 +47,80 @@ const HistoryScreen = () => {
     }, [])
   );
 
+  const getScoreColor = (score) => {
+    if (score > 0.8) return '#4CAF50'; // Green for high confidence
+    if (score > 0.5) return '#FFC107'; // Yellow for medium confidence
+    return '#F44336'; // Red for low confidence
+  };
+
   const renderHistoryItem = ({ item }) => (
-    <View style={styles.historyItem}>
-      <Image
-        source={{ uri: item.image || 'default-placeholder-url' }} // Placeholder jika image kosong
-        style={styles.historyImage}
-      />
-      <View style={styles.historyTextContainer}>
-        <Text style={styles.historyText}>Species: {item.species}</Text>
-        <Text style={styles.historyText}>Score: {(item.score * 100).toFixed(2)}%</Text>
-        <Text style={styles.historyTimestamp}>
-          Predicted on: {new Date(item.timestamp).toLocaleString()}
-        </Text>
+    <TouchableOpacity style={styles.historyItemContainer}>
+      <View style={styles.historyItem}>
+        <Image
+          source={{ uri: item.image || 'default-placeholder-url' }}
+          style={styles.historyImage}
+        />
+        <View style={styles.historyTextContainer}>
+          <Text style={styles.speciesText} numberOfLines={1}>
+            {item.species}
+          </Text>
+          <View style={styles.scoreContainer}>
+            <Text style={styles.confidenceLabel}>Confidence:</Text>
+            <Text 
+              style={[
+                styles.scoreText, 
+                { color: getScoreColor(item.score) }
+              ]}
+            >
+              {(item.score * 100).toFixed(2)}%
+            </Text>
+          </View>
+          <Text style={styles.timestampText}>
+            {new Date(item.timestamp).toLocaleString()}
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
-  
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Image
+            source={require('../assets/Icons/Arrow_Circle_Left.png')}
+            style={styles.backButtonIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Your Scan History</Text>
+      </View>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#00ff00" style={styles.loadingIndicator} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>Loading your history...</Text>
+        </View>
       ) : history.length > 0 ? (
         <FlatList
           data={history}
           keyExtractor={(item) => item._id}
           renderItem={renderHistoryItem}
-          style={styles.historyList}
+          contentContainerStyle={styles.historyList}
+          showsVerticalScrollIndicator={false}
         />
       ) : (
-        <Text style={styles.noHistoryText}>No history found.</Text>
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.emptyStateIcon}>🌱</Text>
+          <Text style={styles.noHistoryTitle}>No Scan History</Text>
+          <Text style={styles.noHistorySubtitle}>
+            Your scanned plant results will appear here
+          </Text>
+        </View>
       )}
-
-      {/* Use the NavBar component */}
-      <NavBar />
     </View>
   );
 };
@@ -81,48 +128,122 @@ const HistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
-  loadingIndicator: {
-    marginTop: 20,
+  headerContainer: {
+    backgroundColor: '#007b6e',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 18,
+    zIndex: 1,
+  },
+  backButtonIcon: {
+    width: 40,
+    height: 40,
+    tintColor: 'white',
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
   },
   historyList: {
-    marginBottom: 80, // Leave space for navbar
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+  },
+  historyItemContainer: {
+    marginBottom: 15,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-    marginBottom: 10,
-    marginHorizontal: 10,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 15,
   },
   historyImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 5,
+    width: 80,
+    height: 80,
+    borderRadius: 15,
     marginRight: 15,
   },
   historyTextContainer: {
     flex: 1,
+    justifyContent: 'center',
   },
-  historyText: {
-    fontSize: 16,
+  speciesText: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#333',
+    marginBottom: 5,
   },
-  historyTimestamp: {
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  confidenceLabel: {
     fontSize: 14,
     color: '#666',
-    marginTop: 5,
+    marginRight: 5,
   },
-  noHistoryText: {
-    marginTop: 20,
-    fontSize: 18,
-    textAlign: 'center',
+  scoreText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  timestampText: {
+    fontSize: 12,
     color: '#888',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyStateIcon: {
+    fontSize: 80,
+    marginBottom: 15,
+  },
+  noHistoryTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 15,
+  },
+  noHistorySubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 

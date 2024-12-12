@@ -77,13 +77,12 @@ const RegisterScreen = ({ navigation }) => {
         }
         navigation.navigate('Login');
       } else {
-        ToastAndroid.show('Registration failed', ToastAndroid.SHORT);
+        ToastAndroid.show('Registration failed. Please try again.', ToastAndroid.SHORT);
       }
     } catch (error) {
-      ToastAndroid.show(
-        error.response?.data?.error || 'Registration error occurred.',
-        ToastAndroid.SHORT
-      );
+      const errorMessage =
+        error.response?.data?.error || 'Registration error occurred. Please try again.';
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
     }
   };
 
@@ -133,14 +132,30 @@ const RegisterScreen = ({ navigation }) => {
           style={styles.eyeIcon}
           onPress={() => setShowPassword(!showPassword)}
         >
-          <Text>{showPassword ? '🙈' : '👁'}</Text>
+          <Image
+            source={
+              showPassword
+                ? require('../assets/Icons/Hide.png')
+                : require('../assets/Icons/eye-show-up-arrow.png')
+            }
+            style={styles.icon}
+          />
         </TouchableOpacity>
       </View>
       {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={[
+    styles.button,
+    (Object.values(errors).some((error) => error) || !username || !email || !password) && { backgroundColor: '#ccc' },
+  ]}
+  onPress={handleRegister}
+  disabled={
+    Object.values(errors).some((error) => error) || !username || !email || !password
+  }>
+  <Text style={styles.buttonText}>Register</Text>
+</TouchableOpacity>
+
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.footerText}>
@@ -150,7 +165,6 @@ const RegisterScreen = ({ navigation }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -190,7 +204,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
   },
-  eyeIcon: {
+  icon: {
+    width: 24,
+    height: 24,
     padding: 5,
   },
   button: {

@@ -79,7 +79,14 @@ const LoginScreen = ({ navigation }) => {
           style={styles.eyeIcon}
           onPress={() => setShowPassword(!showPassword)}
         >
-          <Text>{showPassword ? '🙈' : '👁'}</Text>
+          <Image
+            source={
+              showPassword
+                ? require('../assets/Icons/Hide.png')
+                : require('../assets/Icons/eye-show-up-arrow.png')
+            }
+            style={styles.icon}
+          />
         </TouchableOpacity>
       </View>
 
@@ -135,7 +142,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
   },
-  eyeIcon: {
+  icon: {
+    width: 24,
+    height: 24,
     padding: 5,
   },
   button: {

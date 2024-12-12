@@ -74,15 +74,16 @@ const IdentifyScreen = ({ route }) => {
       ToastAndroid.show('Tidak ada gambar yang dipilih.', ToastAndroid.SHORT);
       return;
     }
-
+  
     setLoading(true);
+    setPrediction(null); // Reset prediksi sebelumnya
     const formData = new FormData();
     formData.append('images', {
       uri: imageUri,
       name: 'photo.jpg',
       type: 'image/jpeg',
     });
-
+  
     try {
       const response = await axios.post(
         'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10P1iYknQtt6YMuwMAqGfjku',
@@ -94,30 +95,39 @@ const IdentifyScreen = ({ route }) => {
           },
         }
       );
-
+  
       const apiData = response.data;
+      if (apiData.results.length === 0) {
+        // Jika tidak ada hasil
+        throw new Error('Spesies tidak ditemukan.');
+      }
+  
       const bestMatch = apiData.bestMatch;
       const results = apiData.results.map(item => ({
         score: item.score,
-        species: item.species.scientificName,
+        species: item.species?.scientificName || 'Unknown Species', // Tangani jika `scientificName` kosong
       }));
-
+  
       setPrediction({ bestMatch, results });
-
+  
       // Tambahkan tanaman ke riwayat
       if (bestMatch) {
         const bestResult = results[0]; // Ambil hasil terbaik
         addPlantToHistory(bestResult.species, bestResult.score * 100, imageUri);
       }
-
+  
       ToastAndroid.show('Gambar berhasil diproses.', ToastAndroid.SHORT);
     } catch (error) {
-      ToastAndroid.show('Gagal memproses gambar.', ToastAndroid.SHORT);
-      console.error('Kesalahan prediksi atau data: ', error);
-    } finally {
-      setLoading(false);
+      setLoading(false);  // Pastikan loading di-set ke false setelah error
+      // Cek error tanpa mencetak rincian error
+      if (error.response && error.response.status === 404) {
+        setPrediction({ error: 'Spesies tidak ditemukan. Coba gambar lain.' });
+      } else {
+        setPrediction({ error: 'Gagal memproses gambar. Silakan coba lagi.' });
+      }
     }
   };
+  
 
   useEffect(() => {
     if (imageUri) {
@@ -155,10 +165,12 @@ const IdentifyScreen = ({ route }) => {
             </View>
 
             <Text style={styles.bestMatchText}>
-              Kecocokan Terbaik: {prediction.bestMatch}
-            </Text>
+  {prediction?.error 
+    ? prediction.error // Tampilkan pesan error jika ada
+    : `Kecocokan Terbaik: ${prediction.bestMatch || 'Species tidak ditemukan'}`}
+</Text>
 
-            {prediction.results.map((result, index) => (
+            {prediction?.results?.map((result, index) => (
               <View key={index} style={styles.resultCard}>
                 <View style={styles.resultContent}>
                   <Text style={styles.flaskEmoji}>🧪</Text>
@@ -172,8 +184,6 @@ const IdentifyScreen = ({ route }) => {
           </View>
         )}
       </ScrollView>
-
-      <NavBar />
     </SafeAreaView>
   );
 };

@@ -1,16 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
-import NavBar from '../components/NavBar'; // Import NavBar
+import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Changed import
+import NavBar from '../components/NavBar';
 import config from '../configs/config';
 
 const HomeScreen = () => {
-  const [collection, setCollection] = useState([]); // State untuk menyimpan koleksi tanaman
-  const [loading, setLoading] = useState(true); // State untuk loading
+  const [collection, setCollection] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch collection dari API
   const fetchCollection = async () => {
     try {
       setLoading(true);
@@ -19,14 +19,12 @@ const HomeScreen = () => {
         console.log('User not logged in');
         return;
       }
-
       const response = await axios.get(`${config.API_BASE_URL}/collection`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      setCollection(response.data); // Menyimpan data koleksi spesies unik
+      setCollection(response.data);
     } catch (error) {
       console.error('Error fetching collection:', error);
     } finally {
@@ -34,95 +32,166 @@ const HomeScreen = () => {
     }
   };
 
-  // Gunakan useFocusEffect untuk memanggil fetchCollection setiap kali HomeScreen mendapat fokus
   useFocusEffect(
     useCallback(() => {
-      fetchCollection(); // Memanggil fetchCollection setiap kali layar HomeScreen mendapat fokus
+      fetchCollection();
     }, [])
   );
 
   const renderCollectionItem = ({ item }) => (
     <TouchableOpacity style={styles.collectionCard}>
       <Image
-        source={{ uri: item.image }} // URL gambar dari backend
+        source={{ uri: item.image }}
         style={styles.plantImage}
         resizeMode="cover"
       />
-      <Text style={styles.collectionText}>{item.species}</Text>
+      <Text style={styles.collectionText} numberOfLines={2}>
+        {item.species}
+      </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Your Plant Collection</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#00ff00" style={styles.loadingIndicator} />
-      ) : collection.length > 0 ? (
-        <FlatList
-          data={collection}
-          keyExtractor={(item) => item._id}
-          renderItem={renderCollectionItem}
-          numColumns={2} // Membuat dua kolom
-          columnWrapperStyle={styles.columnWrapper} // Gaya kolom
-          style={styles.collectionList}
-        />
-      ) : (
-        <Text style={styles.noCollectionText}>No collection found.</Text>
-      )}
+    <SafeAreaView style={styles.container}>
+      {/* Enhanced Header */}
+      <View style={styles.headerContainer}>
+  <Text style={styles.headerTitle}>Your Plant Collection</Text>
+  <Text style={styles.headerSubtitle}>
+    {collection.length} unique plants in your collection
+  </Text>
+</View>
 
-      {/* Use the NavBar component */}
+
+      {/* Collection Content */}
+      <View style={styles.contentContainer}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#4CAF50" style={styles.loadingIndicator} />
+        ) : collection.length > 0 ? (
+          <FlatList
+            data={collection}
+            keyExtractor={(item) => item._id}
+            renderItem={renderCollectionItem}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.collectionList}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View style={styles.emptyStateContainer}>
+            <Icon name="leaf-outline" size={80} color="#E0E0E0" />
+            <Text style={styles.noCollectionText}>
+              Your plant collection is empty
+            </Text>
+            <Text style={styles.noCollectionSubtext}>
+              Start adding your first plant!
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Navigation Bar */}
       <NavBar />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 20,
-    paddingBottom: 100, // Tambahkan padding bawah untuk memberi ruang bagi navbar
+    backgroundColor: '#F5F5F5',
   },
-  text: {
-    fontSize: 20,
-    marginBottom: 20,
+  headerContainer: {
+    backgroundColor: '#007b6e',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    elevation: 5,
+    flexDirection: 'column', // Ubah agar ada elemen stacked
+    alignItems: 'center',
+    position: 'relative',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
-  loadingIndicator: {
-    marginTop: 20,
+  headerSubtitle: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
   },
-  collectionList: {
-    marginTop: 20,
+  subtitleText: {
+    color: '#333',
+    fontSize: 14,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   columnWrapper: {
     justifyContent: 'space-between',
-    marginBottom: 10,
+  },
+  collectionList: {
+    paddingBottom: 20,
   },
   collectionCard: {
-    flex: 0.48, // Mengatur lebar kartu menjadi 48% agar ada jarak antar kolom
-    padding: 15,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    marginBottom: 10,
-    alignItems: 'center',
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
   },
   plantImage: {
     width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: 10,
+    height: 180,
   },
   collectionText: {
+    padding: 10,
     fontSize: 16,
     color: '#333',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
   },
   noCollectionText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
     marginTop: 20,
-    fontSize: 18,
     textAlign: 'center',
-    color: '#888',
+  },
+  noCollectionSubtext: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  addButton: {
+    padding: 5,
   },
 });
 

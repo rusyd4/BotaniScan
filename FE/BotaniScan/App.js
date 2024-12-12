@@ -56,7 +56,7 @@ const App = () => {
         <Stack.Screen
           name="Password"
           component={PasswordScreen} // Add HomeScreen here
-          options={{title: 'Password'}}
+          options={{title: 'Password', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

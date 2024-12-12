@@ -6,12 +6,14 @@ import {
   StyleSheet,
   Modal,
   Alert,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Make sure to install react-native-vector-icons
 
-
+const { width } = Dimensions.get('window');
 
 const NavBar = () => {
   const navigation = useNavigation();
@@ -20,11 +22,7 @@ const NavBar = () => {
   const handleOpenCamera = () => {
     setModalVisible(false);
     launchCamera(
-      {
-        mediaType: 'photo',
-        cameraType: 'back',
-        quality: 1,
-      },
+      { mediaType: 'photo', cameraType: 'back', quality: 1 },
       response => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
@@ -33,22 +31,19 @@ const NavBar = () => {
         } else {
           const uri = response.assets[0]?.uri;
           if (uri) {
-            navigation.navigate('Identify', { imageUri: uri }); // Navigate to CameraScreen
+            navigation.navigate('Identify', { imageUri: uri });
           } else {
             Alert.alert('Error', 'Failed to capture image.');
           }
         }
-      },
+      }
     );
   };
 
   const handleOpenGallery = () => {
     setModalVisible(false);
     launchImageLibrary(
-      {
-        mediaType: 'photo',
-        quality: 1,
-      },
+      { mediaType: 'photo', quality: 1 },
       response => {
         if (response.didCancel) {
           console.log('User cancelled image picker');
@@ -57,12 +52,12 @@ const NavBar = () => {
         } else {
           const uri = response.assets[0]?.uri;
           if (uri) {
-            navigation.navigate('Identify', { imageUri: uri }); // Navigate to CameraScreen
+            navigation.navigate('Identify', { imageUri: uri });
           } else {
             Alert.alert('Error', 'Failed to pick image.');
           }
         }
-      },
+      }
     );
   };
 
@@ -70,40 +65,39 @@ const NavBar = () => {
     <View style={styles.navbar}>
       <TouchableOpacity
         style={styles.navItem}
-              onPress={() => navigation.navigate('Home')}>
-              <Image source={require('../assets/Icons/home.png')} style={styles.iconImage} />
-              <Text style={styles.navText}>Home</Text>
+        onPress={() => navigation.navigate('Home')}>
+        <Image source={require('../assets/Icons/home.png')} style={styles.iconImage} />
+        <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-                onPress={() => navigation.navigate('History')}>
-                <Image source={require('../assets/Icons/ClockClockwise.png')} style={styles.iconImage} />
-                <Text style={styles.navText}>History</Text>
+        onPress={() => navigation.navigate('History')}>
+        <Image source={require('../assets/Icons/ClockClockwise.png')} style={styles.iconImage} />
+        <Text style={styles.navText}>History</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-                onPress={() => setModalVisible(true)}>
-                <Image source={require('../assets/Icons/Vector.png')} style={styles.iconImage} />
-                <Text style={styles.navText}>Scan</Text>
+        onPress={() => setModalVisible(true)}>
+        <Image source={require('../assets/Icons/Vector.png')} style={styles.iconImage} />
+        <Text style={styles.navText}>Scan</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-                onPress={() => navigation.navigate('Leaderboard')}>
-                <Image source={require('../assets/Icons/ChartBar.png')} style={styles.iconImage} />
-                <Text style={styles.navText}>Leaderboard</Text>
+        onPress={() => navigation.navigate('Leaderboard')}>
+        <Image source={require('../assets/Icons/ChartBar.png')} style={styles.iconImage} />
+        <Text style={styles.navText}>Leaderboard</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.navItem}
-                onPress={() => navigation.navigate('User')}>
-                <Image source={require('../assets/Icons/user.png')} style={styles.iconImage} />
-                <Text style={styles.navText}>User</Text>
+        onPress={() => navigation.navigate('User')}>
+        <Image source={require('../assets/Icons/user.png')} style={styles.iconImage} />
+        <Text style={styles.navText}>User</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -111,29 +105,38 @@ const NavBar = () => {
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Choose an Option</Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleOpenCamera}>
-              <Text style={styles.modalButtonText}>Open Camera</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleOpenGallery}>
-              <Text style={styles.modalButtonText}>Open Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.closeButton]}
-              onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Cancel</Text>
-            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={() => setModalVisible(false)}
+            >
+                <Image source={require('../assets/Icons/Close_LG.png')} style={styles.closeIcon} />
+                </TouchableOpacity>
+
+            <Text style={styles.modalTitle}>Choose Scan Method</Text>
+            
+            <View style={styles.optionsContainer}>
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleOpenCamera}>
+                                <Image source={require('../assets/Icons/Camera.png')} style={styles.icon} />
+
+                <Text style={styles.optionButtonText}>Camera</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleOpenGallery}>
+                                <Image source={require('../assets/Icons/Image.png')} style={styles.icon} />
+
+                <Text style={styles.optionButtonText}>Gallery</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
@@ -151,11 +154,12 @@ const styles = StyleSheet.create({
   navItem: {
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   iconImage: {
-      width: 24,
-      height: 24,
-      resizeMode: 'contain',
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   navText: {
     color: '#fff',
@@ -169,32 +173,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: '80%',
+    width: width * 0.85,
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
+    borderRadius: 20,
+    padding: 25,
     alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  modalButton: {
-    backgroundColor: '#007b6e',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 5,
-    width: '100%',
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   closeButton: {
-    backgroundColor: '#999',
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 1,
+  },
+  icon: {
+    width: 48,
+    height: 48,
+  },
+  closeIcon: {
+    width: 20,
+    height: 20,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 25,
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  optionButton: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 15,
+    padding: 20,
+    alignItems: 'center',
+    width: '45%',
+  },
+  optionIconContainer: {
+    backgroundColor: 'rgba(0, 123, 110, 0.1)',
+    borderRadius: 50,
+    padding: 15,
+    marginBottom: 10,
+  },
+  optionButtonText: {
+    color: '#007b6e',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
