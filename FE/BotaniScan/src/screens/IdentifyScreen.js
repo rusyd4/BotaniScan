@@ -9,15 +9,19 @@ import {
   ScrollView,
   Dimensions,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
 import config from '../configs/config';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
 const IdentifyScreen = ({ route }) => {
+    const navigation = useNavigation();
+  
   const [imageUri, setImageUri] = useState(route.params?.imageUri || null);
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -74,16 +78,15 @@ const IdentifyScreen = ({ route }) => {
       ToastAndroid.show('Tidak ada gambar yang dipilih.', ToastAndroid.SHORT);
       return;
     }
-  
+
     setLoading(true);
-    setPrediction(null); // Reset prediksi sebelumnya
     const formData = new FormData();
     formData.append('images', {
       uri: imageUri,
       name: 'photo.jpg',
       type: 'image/jpeg',
     });
-  
+
     try {
       const response = await axios.post(
         'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10P1iYknQtt6YMuwMAqGfjku',
@@ -95,39 +98,35 @@ const IdentifyScreen = ({ route }) => {
           },
         }
       );
-  
+    
       const apiData = response.data;
-      if (apiData.results.length === 0) {
-        // Jika tidak ada hasil
-        throw new Error('Spesies tidak ditemukan.');
-      }
-  
       const bestMatch = apiData.bestMatch;
       const results = apiData.results.map(item => ({
         score: item.score,
-        species: item.species?.scientificName || 'Unknown Species', // Tangani jika `scientificName` kosong
+        species: item.species.scientificName,
       }));
-  
+    
       setPrediction({ bestMatch, results });
-  
+    
       // Tambahkan tanaman ke riwayat
       if (bestMatch) {
         const bestResult = results[0]; // Ambil hasil terbaik
         addPlantToHistory(bestResult.species, bestResult.score * 100, imageUri);
       }
-  
+    
       ToastAndroid.show('Gambar berhasil diproses.', ToastAndroid.SHORT);
     } catch (error) {
-      setLoading(false);  // Pastikan loading di-set ke false setelah error
-      // Cek error tanpa mencetak rincian error
       if (error.response && error.response.status === 404) {
-        setPrediction({ error: 'Spesies tidak ditemukan. Coba gambar lain.' });
+        setPrediction({ bestMatch: 'Spesies tidak ditemukan', results: [] });
+        ToastAndroid.show('Spesies tidak ditemukan.', ToastAndroid.SHORT);
       } else {
-        setPrediction({ error: 'Gagal memproses gambar. Silakan coba lagi.' });
+        ToastAndroid.show('Gagal memproses gambar.', ToastAndroid.SHORT);
       }
+    } finally {
+      setLoading(false);
     }
+    
   };
-  
 
   useEffect(() => {
     if (imageUri) {
@@ -136,7 +135,20 @@ const IdentifyScreen = ({ route }) => {
   }, [imageUri]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.headerContainerr}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.navigate('Home')}
+              >
+                <Image
+                  source={require('../assets/Icons/Arrow_Circle_Left.png')}
+                  style={styles.backButtonIcon}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+              <Text style={styles.headerTitlee}>Identification Result</Text>
+            </View>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -157,34 +169,35 @@ const IdentifyScreen = ({ route }) => {
           </View>
         )}
 
-        {prediction && !loading && (
-          <View style={styles.resultContainer}>
-            <View style={styles.headerContainer}>
-              <Text style={styles.leafEmoji}>🍃</Text>
-              <Text style={styles.headerTitle}>Hasil Identifikasi</Text>
-            </View>
+{prediction && !loading && (
+  <View style={styles.resultContainer}>
+    <View style={styles.headerContainer}>
+      <Text style={styles.leafEmoji}>🍃</Text>
+      <Text style={styles.headerTitle}>
+        {prediction.bestMatch || 'Spesies tidak ditemukan'}
+      </Text>
+    </View>
 
-            <Text style={styles.bestMatchText}>
-  {prediction?.error 
-    ? prediction.error // Tampilkan pesan error jika ada
-    : `Kecocokan Terbaik: ${prediction.bestMatch || 'Species tidak ditemukan'}`}
-</Text>
-
-            {prediction?.results?.map((result, index) => (
-              <View key={index} style={styles.resultCard}>
-                <View style={styles.resultContent}>
-                  <Text style={styles.flaskEmoji}>🧪</Text>
-                  <Text style={styles.resultSpecies}>{result.species}</Text>
-                </View>
-                <Text style={styles.resultScore}>
-                  Akurasi: {(result.score * 100).toFixed(2)}%
-                </Text>
-              </View>
-            ))}
+    {prediction.results.length > 0 ? (
+      prediction.results.map((result, index) => (
+        <View key={index} style={styles.resultCard}>
+          <View style={styles.resultContent}>
+            <Text style={styles.resultSpecies}>{result.species}</Text>
           </View>
-        )}
+          <Text style={styles.resultScore}>
+            Akurasi: {(result.score * 100).toFixed(2)}%
+          </Text>
+        </View>
+      ))
+    ) : (
+      <Text style={styles.noResultsText}>Tidak ada spesies yang cocok ditemukan.</Text>
+    )}
+  </View>
+)}
+
       </ScrollView>
-    </SafeAreaView>
+
+    </View>
   );
 };
 
@@ -193,6 +206,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#E8F5E9',
+  },
+  headerContainerr: {
+    backgroundColor: '#007b6e',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 18,
+    zIndex: 1,
+  },
+  backButtonIcon: {
+    width: 40,
+    height: 40,
+    tintColor: 'white',
+  },
+  headerTitlee: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
   },
   scrollView: {
     backgroundColor: '#E8F5E9',
@@ -293,6 +336,14 @@ const styles = StyleSheet.create({
     color: '#2E7D32',
     textAlign: 'right',
   },
+  noResultsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FF5722',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  
 });
 
 export default IdentifyScreen;

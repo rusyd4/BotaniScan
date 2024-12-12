@@ -128,7 +128,7 @@ const HistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#E8F5E9',
   },
   headerContainer: {
     backgroundColor: '#007b6e',

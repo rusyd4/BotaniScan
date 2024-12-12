@@ -279,20 +279,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   modalButtonCancel: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#007b6e',
     borderWidth: 1,
     borderColor: '#ddd',
   },
   modalButtonConfirm: {
-    backgroundColor: '#00c853',
+    backgroundColor: '#f0f0f0',
   },
   modalButtonTextCancel: {
-    color: '#333',
+    color: '#fff',
     fontSize: 16,
     fontWeight: '500',
   },
   modalButtonTextConfirm: {
-    color: '#ffffff',
+    color: '#000',
     fontSize: 16,
     fontWeight: '500',
   },

@@ -1,30 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import NavBar from '../components/NavBar'; // Import the NavBar component
+import NavBar from '../components/NavBar';
 import config from '../configs/config';
+import LinearGradient from 'react-native-linear-gradient';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const LeaderboardScreen = () => {
-  const [leaderboard, setLeaderboard] = useState([]); // State untuk leaderboard
-  const [loading, setLoading] = useState(true); // State untuk loading
+  const navigation = useNavigation();
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        // Fetch leaderboard data dari backend
         const response = await axios.get(`${config.API_BASE_URL}/leaderboard`);
-        setLeaderboard(response.data); // Menyimpan data leaderboard
+        setLeaderboard(response.data);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
       } finally {
-        setLoading(false); // Sembunyikan indikator loading setelah fetch selesai
+        setLoading(false);
       }
     };
 
     fetchLeaderboard();
   }, []);
 
-  // Render podium untuk 3 peringkat teratas
   const renderPodium = () => {
     const first = leaderboard[0] || { username: 'N/A', collectionSize: 0 };
     const second = leaderboard[1] || { username: 'N/A', collectionSize: 0 };
@@ -34,54 +35,100 @@ const LeaderboardScreen = () => {
       <View style={styles.podiumContainer}>
         {/* Peringkat kedua */}
         <View style={[styles.podiumBlock, styles.secondPlace]}>
-          <Text style={styles.podiumRank}>2</Text>
-          <Text style={styles.podiumName}>{second.username}</Text>
-          <Text style={styles.podiumPoints}>{second.collectionSize} Collections</Text>
+          <LinearGradient 
+            colors={['#B1B1B1', '#808080']} 
+            style={styles.podiumGradient}
+          >
+            <View style={styles.podiumContent}>
+              <Image 
+                source={require('../assets/Icons/silver-trophy.png')} 
+                style={[styles.trophyIcon, { height: 50, width: 62 }]} 
+              />
+              <Text style={styles.podiumRank}>2nd</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>{second.username}</Text>
+              <Text style={styles.podiumPoints}>{second.collectionSize} Collections</Text>
+            </View>
+          </LinearGradient>
         </View>
+
         {/* Peringkat pertama */}
         <View style={[styles.podiumBlock, styles.firstPlace]}>
-          <Text style={styles.podiumRank}>1</Text>
-          <Text style={styles.podiumName}>{first.username}</Text>
-          <Text style={styles.podiumPoints}>{first.collectionSize} Collections</Text>
+          <LinearGradient 
+            colors={['#FFD700', '#FFA500']} 
+            style={styles.podiumGradient}
+          >
+            <View style={styles.podiumContent}>
+              <Image 
+                source={require('../assets/Icons/gold-trophy.png')} 
+                style={[styles.trophyIcon, { height: 70, width: 82 }]} 
+              />
+              <Text style={styles.podiumRank}>1st</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>{first.username}</Text>
+              <Text style={styles.podiumPoints}>{first.collectionSize} Collections</Text>
+            </View>
+          </LinearGradient>
         </View>
+
         {/* Peringkat ketiga */}
         <View style={[styles.podiumBlock, styles.thirdPlace]}>
-          <Text style={styles.podiumRank}>3</Text>
-          <Text style={styles.podiumName}>{third.username}</Text>
-          <Text style={styles.podiumPoints}>{third.collectionSize} Collections</Text>
+          <LinearGradient 
+            colors={['#CD7F32', '#8B4513']} 
+            style={styles.podiumGradient}
+          >
+            <View style={styles.podiumContent}>
+              <Image 
+                source={require('../assets/Icons/bronze-trophy.png')} 
+                style={[styles.trophyIcon, { height: 40, width: 52 }]} 
+              />
+              <Text style={styles.podiumRank}>3rd</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>{third.username}</Text>
+              <Text style={styles.podiumPoints}>{third.collectionSize} Collections</Text>
+            </View>
+          </LinearGradient>
         </View>
       </View>
     );
   };
 
-  // Render item untuk sisa leaderboard
   const renderLeaderboardItem = ({ item, index }) => (
     <View style={styles.leaderboardItem}>
-      <Text style={styles.rankText}>{index + 4}. {item.username}</Text>
-      <Text style={styles.collectionText}>Collections: {item.collectionSize}</Text>
+      <View style={styles.leaderboardItemContent}>
+        <Text style={styles.rankText}>{index + 4}.</Text>
+        <Text style={styles.usernameText} numberOfLines={1}>{item.username}</Text>
+      </View>
+      <Text style={styles.collectionText}>{item.collectionSize} Collections</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Leaderboard</Text>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Image
+            source={require('../assets/Icons/Arrow_Circle_Left.png')}
+            style={styles.backButtonIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Leaderboard</Text>
+      </View>
       {loading ? (
-        <ActivityIndicator size="large" color="#00ff00" style={styles.loadingIndicator} />
+        <ActivityIndicator size="large" color="#4B9CD3" style={styles.loadingIndicator} />
       ) : (
         <>
-          {/* Tampilkan podium */}
           {leaderboard.length > 0 && renderPodium()}
-          {/* Tampilkan sisa leaderboard */}
           <FlatList
             data={leaderboard.slice(3)}
             keyExtractor={(item, index) => item.username || index.toString()}
             renderItem={renderLeaderboardItem}
-            style={styles.leaderboardList}
+            contentContainerStyle={styles.leaderboardList}
+            showsVerticalScrollIndicator={false}
           />
         </>
       )}
-      {/* Gunakan NavBar */}
-      <NavBar />
     </View>
   );
 };
@@ -89,81 +136,133 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 20,
+    backgroundColor: '#E8F5E9',
   },
-  header: {
+  headerContainer: {
+    backgroundColor: '#007b6e',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 18,
+    zIndex: 1,
+  },
+  backButtonIcon: {
+    width: 40,
+    height: 40,
+    tintColor: 'white',
+  },
+  headerTitle: {
+    color: 'white',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     textAlign: 'center',
-    marginBottom: 20,
+    flex: 1,
   },
   loadingIndicator: {
-    marginTop: 20,
-  },
-  leaderboardList: {
-    marginTop: 20,
+    marginTop: 50,
   },
   podiumContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    marginBottom: 30,
+    marginVertical: 20,
+    paddingHorizontal: 20,
   },
   podiumBlock: {
-    alignItems: 'center',
+    width: 110,
+    borderRadius: 20,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  podiumGradient: {
+    flex: 1,
     justifyContent: 'flex-end',
-    padding: 10,
-    borderRadius: 10,
-    width: 100,
+  },
+  podiumContent: {
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   firstPlace: {
-    backgroundColor: '#FFD700',
-    height: 150,
+    height: 210,
   },
   secondPlace: {
-    backgroundColor: '#C0C0C0',
-    height: 130,
+    height: 190,
   },
   thirdPlace: {
-    backgroundColor: '#CD7F32',
-    height: 115,
+    height: 170,
   },
   podiumRank: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'white',
     marginBottom: 5,
   },
   podiumName: {
     fontSize: 16,
-    color: '#fff',
+    color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 5,
   },
   podiumPoints: {
     fontSize: 14,
-    color: '#fff',
+    color: 'white',
     textAlign: 'center',
   },
+  trophyIcon: {
+    marginBottom: 10,
+  },
+  leaderboardList: {
+    paddingHorizontal: 20,
+  },
   leaderboardItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
-      marginHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 12,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+  },
+  leaderboardItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rankText: {
+    fontSize: 18,
+    color: '#007b6e',
+    fontWeight: 'bold',
+    marginRight: 10,
+    width: 40,
+  },
+  usernameText: {
     fontSize: 16,
-    color: '#333',
+    color: '#2C3E50',
+    maxWidth: 150,
   },
   collectionText: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 16,
+    color: '#007b6e',
+    fontWeight: 'bold',
   },
 });
 

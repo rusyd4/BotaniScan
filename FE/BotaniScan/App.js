@@ -36,7 +36,7 @@ const App = () => {
         <Stack.Screen
           name="Identify"
           component={IdentifyScreen} // Add HomeScreen here
-          options={{title: 'Identify'}}
+          options={{title: 'Identify', headerShown: false}}
         />
         <Stack.Screen
           name="History"
