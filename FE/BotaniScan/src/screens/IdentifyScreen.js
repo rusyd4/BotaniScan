@@ -174,7 +174,7 @@ const IdentifyScreen = ({ route }) => {
     <View style={styles.headerContainer}>
       <Text style={styles.leafEmoji}>🍃</Text>
       <Text style={styles.headerTitle}>
-        {prediction.bestMatch || 'Spesies tidak ditemukan'}
+        {'Best Match: '  + '\n'+ (prediction.bestMatch || 'Spesies tidak ditemukan')}
       </Text>
     </View>
 

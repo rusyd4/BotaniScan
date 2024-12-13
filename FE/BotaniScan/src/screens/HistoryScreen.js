@@ -33,7 +33,8 @@ const HistoryScreen = () => {
         },
       });
 
-      setHistory(response.data);
+      // Sort history by timestamp in descending order
+      setHistory(response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
     } catch (error) {
       console.error('Error fetching history:', error);
     } finally {

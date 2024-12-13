@@ -34,34 +34,35 @@ router.post('/change-password', authenticate, async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
     }
-        // Verifikasi password saat ini
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isMatch) {
-          return res.status(401).json({ error: 'Current password is incorrect.' });
-        }
     
-        // Hash password baru
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    
-        // Perbarui password pengguna
-        user.password = hashedNewPassword;
-        await user.save();
-    
-        res.status(200).json({ message: 'Password updated successfully.' });
-      } catch (error) {
-        console.error('Error changing password:', error);
-        res.status(500).json({ error: 'Failed to change password. Please try again later.' });
-      }
-    });
-    
-// Endpoint untuk mengganti foto profil
-router.put('/update-profile-picture', authenticate, async (req, res) => {
+    // Verifikasi password saat ini
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Current password is incorrect.' });
+    }
+
+    // Hash password baru
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Perbarui password pengguna
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ error: 'Failed to change password. Please try again later.' });
+  }
+});
+
+// Change Username
+router.put('/change-username', authenticate, async (req, res) => {
   try {
-    const { profilePicture } = req.body;
+    const { username } = req.body;
 
     // Validasi input
-    if (!profilePicture) {
-      return res.status(400).json({ error: 'Profile picture URL is required.' });
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required.' });
     }
 
     // Cari user berdasarkan ID dari token
@@ -70,19 +71,15 @@ router.put('/update-profile-picture', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    // Perbarui foto profil pengguna
-    user.profilePicture = profilePicture;
+    // Perbarui username pengguna
+    user.username = username;
     await user.save();
 
-    res.status(200).json({
-      message: 'Profile picture updated successfully.',
-      profilePicture: user.profilePicture,
-    });
+    res.status(200).json({ message: 'Username updated successfully.' });
   } catch (error) {
-    console.error('Error updating profile picture:', error);
-    res.status(500).json({ error: 'Failed to update profile picture. Please try again later.' });
+    console.error('Error changing username:', error);
+    res.status(500).json({ error: 'Failed to change username. Please try again later.' });
   }
 });
-    
 
 module.exports = router;
